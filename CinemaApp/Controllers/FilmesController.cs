@@ -166,79 +166,183 @@ namespace CinemaApp.Controllers
         // CONSULTAS LINQ - ATENDENDO OS PEDIDOS
         // =============================================
 
-        // CONSULTA 1: JOIN entre 2 classes (Filme + Categoria)
-        public async Task<IActionResult> Consulta1()
+        // CONSULTA 1: Dados de duas classes (Filmes + Categorias) - CORRIGIDA
+        public async Task<IActionResult> Consulta1(int? categoriaId)
         {
-            var resultado = await _context.Filmes
-                .Join(_context.Categorias,
-                    filme => filme.CategoriaId,
-                    categoria => categoria.CategoriaId,
-                    (filme, categoria) => new
-                    {
-                        FilmeTitulo = filme.Titulo,
-                        Ano = filme.AnoLancamento,
-                        Idade = DateTime.Now.Year - filme.AnoLancamento,
-                        Categoria = categoria.Nome,
-                        Descricao = categoria.Descricao
-                    })
-                .OrderBy(x => x.Categoria)
-                .ThenBy(x => x.FilmeTitulo)
+            // Buscar categorias para o select
+            ViewBag.Categorias = new SelectList(await _context.Categorias.ToListAsync(), "CategoriaId", "Nome");
+
+            var query = _context.Filmes
+                .Include(f => f.Categoria)
+                .Include(f => f.Produtora)
+                .AsQueryable();
+
+            // Aplicar filtro de categoria se selecionado
+            if (categoriaId.HasValue)
+            {
+                query = query.Where(f => f.CategoriaId == categoriaId.Value);
+            }
+
+            var resultado = await query
+                .Select(f => new
+                {
+                    Filme = f.Titulo,
+                    Ano = f.AnoLancamento,
+                    Idade = DateTime.Now.Year - f.AnoLancamento, // Usando método existente
+                    Categoria = f.Categoria.Nome,
+                    DescricaoCategoria = f.Categoria.Descricao,
+                    Produtora = f.Produtora.Nome
+                })
+                .OrderBy(f => f.Categoria)
+                .ThenBy(f => f.Filme)
                 .ToListAsync();
 
-            ViewBag.Titulo = "Consulta 1: JOIN entre Filmes e Categorias";
-            ViewBag.Descricao = "Demonstra JOIN entre duas tabelas relacionadas";
-            return View("ConsultaLinq", resultado);
+            var resultadoConvertido = resultado.Cast<object>().ToList();
+
+            ViewBag.Titulo = "Consulta 1 - Filmes por Categoria";
+            ViewBag.Descricao = "Dados combinados de Filmes e Categorias";
+            ViewBag.CategoriaSelecionada = categoriaId;
+
+            return View("Consulta1", resultadoConvertido);
         }
 
-        // CONSULTA 2: GROUP BY com funções de grupo
-        public async Task<IActionResult> Consulta2()
+        // CONSULTA 2: Funções de grupo (GROUP BY) - SIMPLIFICADA
+        public async Task<IActionResult> Consulta2(string grupoPor)
         {
-            var resultado = await _context.Filmes
+            var opcoesGrupo = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "categoria", Text = "Categoria" },
+        new SelectListItem { Value = "produtora", Text = "Produtora" },
+        new SelectListItem { Value = "ano", Text = "Ano de Lançamento" }
+    };
+            ViewBag.GrupoPor = new SelectList(opcoesGrupo, "Value", "Text", grupoPor);
+
+            // Definir view diretamente baseada no grupo
+            ViewBag.Titulo = "Consulta 2 - Estatísticas por Grupo";
+            ViewBag.Descricao = $"Agrupado por: {(string.IsNullOrEmpty(grupoPor) ? "Categoria" : grupoPor)}";
+            ViewBag.GrupoSelecionado = grupoPor;
+
+            if (string.IsNullOrEmpty(grupoPor))
+            {
+                return View("Consulta2", new List<object>());
+            }
+
+            // Fazer a consulta e passar diretamente para a view sem conversões complexas
+            switch (grupoPor)
+            {
+                case "categoria":
+                    var resultadoCategoria = await _context.Filmes
+                        .Include(f => f.Categoria)
+                        .GroupBy(f => f.Categoria.Nome)
+                        .Select(g => new
+                        {
+                            Grupo = g.Key,
+                            TotalFilmes = g.Count(),
+                            AnoMaisRecente = g.Max(f => f.AnoLancamento),
+                            AnoMaisAntigo = g.Min(f => f.AnoLancamento),
+                            AnoMedio = g.Average(f => f.AnoLancamento)
+                        })
+                        .OrderByDescending(x => x.TotalFilmes)
+                        .ToListAsync();
+                    return View("Consulta2", resultadoCategoria);
+
+                case "produtora":
+                    var resultadoProdutora = await _context.Filmes
+                        .Include(f => f.Produtora)
+                        .GroupBy(f => f.Produtora.Nome)
+                        .Select(g => new
+                        {
+                            Grupo = g.Key,
+                            TotalFilmes = g.Count(),
+                            AnoMaisRecente = g.Max(f => f.AnoLancamento),
+                            AnoMaisAntigo = g.Min(f => f.AnoLancamento),
+                            AnoMedio = g.Average(f => f.AnoLancamento)
+                        })
+                        .OrderByDescending(x => x.TotalFilmes)
+                        .ToListAsync();
+                    return View("Consulta2", resultadoProdutora);
+
+                case "ano":
+                    var resultadoAno = await _context.Filmes
+                        .GroupBy(f => f.AnoLancamento)
+                        .Select(g => new
+                        {
+                            Grupo = g.Key.ToString(),
+                            TotalFilmes = g.Count(),
+                            AnoMedio = g.Average(f => f.AnoLancamento)
+                        })
+                        .OrderByDescending(x => x.TotalFilmes)
+                        .ToListAsync();
+                    return View("Consulta2", resultadoAno);
+
+                default:
+                    return View("Consulta2", new List<object>());
+            }
+        }
+
+        // CONSULTA 3: WHERE + HAVING - CORRIGIDA
+        public async Task<IActionResult> Consulta3(string filtroWhere, int? quantidadeMinima)
+        {
+            var opcoesWhere = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "antigos", Text = "Filmes Antigos (antes de 2000)" },
+        new SelectListItem { Value = "recentes", Text = "Filmes Recentes (após 2010)" },
+        new SelectListItem { Value = "classicos", Text = "Filmes Clássicos (1980-1999)" },
+        new SelectListItem { Value = "modernos", Text = "Filmes Modernos (2000-2010)" }
+    };
+            ViewBag.FiltroWhere = new SelectList(opcoesWhere, "Value", "Text", filtroWhere);
+
+            var opcoesHaving = new List<SelectListItem>
+    {
+        new SelectListItem { Value = "1", Text = "Pelo menos 1 filme" },
+        new SelectListItem { Value = "2", Text = "Pelo menos 2 filmes" },
+        new SelectListItem { Value = "3", Text = "Pelo menos 3 filmes" }
+    };
+            ViewBag.QuantidadeMinima = new SelectList(opcoesHaving, "Value", "Text", quantidadeMinima?.ToString());
+
+            var query = _context.Filmes.AsQueryable();
+
+            // WHERE - Filtro principal (usando apenas AnoLancamento que EXISTE)
+            switch (filtroWhere)
+            {
+                case "antigos":
+                    query = query.Where(f => f.AnoLancamento < 2000);
+                    break;
+                case "recentes":
+                    query = query.Where(f => f.AnoLancamento > 2010);
+                    break;
+                case "classicos":
+                    query = query.Where(f => f.AnoLancamento >= 1980 && f.AnoLancamento <= 1999);
+                    break;
+                case "modernos":
+                    query = query.Where(f => f.AnoLancamento >= 2000 && f.AnoLancamento <= 2010);
+                    break;
+            }
+
+            // GROUP BY + HAVING (agrupando por Categoria em vez de Genero)
+            var resultado = await query
                 .Include(f => f.Categoria)
                 .GroupBy(f => f.Categoria.Nome)
-                .Select(grupo => new
+                .Where(g => !quantidadeMinima.HasValue || g.Count() >= quantidadeMinima.Value) // HAVING
+                .Select(g => new
                 {
-                    Categoria = grupo.Key,
-                    QuantidadeFilmes = grupo.Count(),
-                    AnoMaisRecente = grupo.Max(f => f.AnoLancamento),
-                    AnoMaisAntigo = grupo.Min(f => f.AnoLancamento),
-                    MediaAno = grupo.Average(f => f.AnoLancamento),
-                    TotalFilmes = grupo.Count()
+                    Categoria = g.Key,
+                    QuantidadeFilmes = g.Count(),
+                    AnoMedio = g.Average(f => f.AnoLancamento),
+                    IdadeMedia = g.Average(f => DateTime.Now.Year - f.AnoLancamento),
+                    Filmes = g.Select(f => new { f.Titulo, f.AnoLancamento }).ToList()
                 })
                 .OrderByDescending(g => g.QuantidadeFilmes)
                 .ToListAsync();
 
-            ViewBag.Titulo = "Consulta 2: GROUP BY - Filmes por Categoria";
-            ViewBag.Descricao = "Demonstra GROUP BY com funções de agregação (COUNT, MAX, MIN, AVG)";
-            return View("ConsultaLinq", resultado);
-        }
+            var resultadoConvertido = resultado.Cast<object>().ToList();
 
-        // CONSULTA 3: WHERE + HAVING
-        public async Task<IActionResult> Consulta3()
-        {
-            var resultado = await _context.Filmes
-                .Include(f => f.Produtora)
-                .Where(f => f.AnoLancamento < 2000) // WHERE - filtro principal
-                .GroupBy(f => f.Produtora.Nome)
-                .Where(grupo => grupo.Count() >= 1) // HAVING - filtro do grupo
-                .Select(grupo => new
-                {
-                    Produtora = grupo.Key,
-                    QuantidadeFilmesAntigos = grupo.Count(),
-                    MediaAno = grupo.Average(f => f.AnoLancamento),
-                    AnoMaisAntigo = grupo.Min(f => f.AnoLancamento),
-                    Filmes = grupo.Select(f => new
-                    {
-                        Titulo = f.Titulo,
-                        Ano = f.AnoLancamento
-                    }).ToList()
-                })
-                .OrderByDescending(g => g.QuantidadeFilmesAntigos)
-                .ToListAsync();
+            ViewBag.Titulo = "Consulta 3 - Filtros WHERE + HAVING";
+            ViewBag.Descricao = "Filtre filmes por ano e agrupe por categoria com quantidade mínima";
+            ViewBag.FiltroSelecionado = filtroWhere;
+            ViewBag.QuantidadeSelecionada = quantidadeMinima;
 
-            ViewBag.Titulo = "Consulta 3: WHERE + HAVING - Filmes Antigos por Produtora";
-            ViewBag.Descricao = "Demonstra WHERE (filtro individual) + HAVING (filtro de grupo)";
-            return View("ConsultaLinq", resultado);
+            return View("Consulta3", resultadoConvertido);
         }
     }
 }

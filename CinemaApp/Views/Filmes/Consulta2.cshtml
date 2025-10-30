@@ -1,0 +1,72 @@
+﻿@model dynamic
+@{
+    ViewData["Title"] = "Consulta 2 - Estatísticas por Grupo";
+}
+
+<div class="container">
+    <h2>@ViewData["Title"]</h2>
+    <p class="text-muted">@ViewBag.Descricao</p>
+
+    <!-- FORMULÁRIO -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" asp-action="Consulta2">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="grupoPor">Agrupar por:</label>
+                            <select class="form-control" id="grupoPor" name="grupoPor">
+                                <option value="">-- Selecione o critério --</option>
+                                @foreach (var item in ViewBag.GrupoPor)
+                                {
+                                    <option value="@item.Value" selected="@(item.Value == ViewBag.GrupoSelecionado)">@item.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 align-self-end">
+                        <button type="submit" class="btn btn-primary">Gerar Relatório</button>
+                        <a href="@Url.Action("Consulta2")" class="btn btn-secondary">Resetar</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- RESULTADOS -->
+    @if (Model != null && Model.Count > 0)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Grupo</th>
+                        <th>Total de Filmes</th>
+                        <th>Ano Mais Recente</th>
+                        <th>Ano Mais Antigo</th>
+                        <th>Ano Médio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td><strong>@item.Grupo</strong></td>
+                            <td><span class="badge bg-primary">@item.TotalFilmes</span></td>
+                            <td>@(item.AnoMaisRecente?.ToString() ?? "N/A")</td>
+                            <td>@(item.AnoMaisAntigo?.ToString() ?? "N/A")</td>
+                            <td>@(item.AnoMedio?.ToString("F1") ?? "N/A")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <p class="text-success">Total de grupos: @Model.Count</p>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            Selecione um critério de agrupamento para ver as estatísticas.
+        </div>
+    }
+</div>

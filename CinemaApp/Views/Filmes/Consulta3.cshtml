@@ -1,0 +1,150 @@
+﻿@model List<object>
+@{
+    ViewData["Title"] = "Consulta 3 - Filtros WHERE + HAVING";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Filmes</a></li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                    <small>Aplique filtros WHERE e defina quantidade mínima por grupo (HAVING)</small>
+                </div>
+                <div class="card-body">
+                    <!-- FORMULÁRIO -->
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="get" asp-action="Consulta3">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="filtroWhere">Filtro WHERE (por ano):</label>
+                                            <select class="form-control" id="filtroWhere" name="filtroWhere">
+                                                <option value="">-- Selecionar Filtro --</option>
+                                                @foreach (var item in ViewBag.FiltroWhere)
+                                                {
+                                                    <option value="@item.Value"
+                                                            selected="@(item.Value == ViewBag.FiltroSelecionado)">
+                                                        @item.Text
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="quantidadeMinima">Filtro HAVING (mínimo por categoria):</label>
+                                            <select class="form-control" id="quantidadeMinima" name="quantidadeMinima">
+                                                <option value="">-- Qualquer quantidade --</option>
+                                                @foreach (var item in ViewBag.QuantidadeMinima)
+                                                {
+                                                    <option value="@item.Value"
+                                                            selected="@(item.Value == ViewBag.QuantidadeSelecionada?.ToString())">
+                                                        @item.Text
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4 align-self-end">
+                                        <button type="submit" class="btn btn-warning">
+                                            <i class="fas fa-filter"></i> Aplicar Filtros
+                                        </button>
+                                        <a href="@Url.Action("Consulta3")" class="btn btn-secondary">
+                                            <i class="fas fa-times"></i> Limpar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- RESULTADOS -->
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>Categoria</th>
+                                        <th>Quantidade</th>
+                                        <th>Ano Médio</th>
+                                        <th>Idade Média</th>
+                                        <th>Filmes no Grupo</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (dynamic item in Model)
+                                    {
+                                        <tr>
+                                            <td><strong>@item.Categoria</strong></td>
+                                            <td>
+                                                <span class="badge bg-primary fs-6">@item.QuantidadeFilmes</span>
+                                            </td>
+                                            <td>@item.AnoMedio.ToString("F1")</td>
+                                            <td>@item.IdadeMedia.ToString("F1") anos</td>
+                                            <td>
+                                                <div class="film-list">
+                                                    @foreach (var filme in item.Filmes)
+                                                    {
+                                                        <span class="badge bg-secondary mb-1">
+                                                            @filme.Titulo (@filme.AnoLancamento)
+                                                        </span>
+                                                    }
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="alert alert-success">
+                                <strong>Filtros aplicados com sucesso!</strong><br>
+                                <small>
+                                    WHERE: @(string.IsNullOrEmpty(ViewBag.FiltroSelecionado) ? "Nenhum" : ViewBag.FiltroSelecionado) |
+                                    HAVING: @(ViewBag.QuantidadeSelecionada == null ? "Qualquer quantidade" : "Mínimo " + ViewBag.QuantidadeSelecionada + " filmes") |
+                                    Total de categorias: @Model.Count
+                                </small>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <strong>Nenhum resultado encontrado!</strong><br>
+                            <small>Tente ajustar os filtros WHERE e HAVING para encontrar resultados.</small>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Voltar para Lista de Filmes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .film-list {
+        max-height: 150px;
+        overflow-y: auto;
+    }
+    .badge {
+        margin-right: 5px;
+        margin-bottom: 5px;
+        display: inline-block;
+    }
+</style>
