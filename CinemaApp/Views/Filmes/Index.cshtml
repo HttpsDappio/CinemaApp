@@ -1,0 +1,85 @@
+@model IEnumerable<CinemaApp.Models.Filme>
+
+@{
+    ViewData["Title"] = "Filmes";
+}
+
+<h1>Filmes</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Adicionar Novo Filme</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Ano Lançamento</th>
+            <th>Categoria</th>
+            <th>Produtora</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Titulo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AnoLancamento)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Categoria.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Produtora.Nome)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.FilmeId" class="btn btn-warning btn-sm">Editar</a>
+                    <a asp-action="Details" asp-route-id="@item.FilmeId" class="btn btn-info btn-sm">Detalhes</a>
+                    <a asp-action="Delete" asp-route-id="@item.FilmeId" class="btn btn-danger btn-sm">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- MENU DE CONSULTAS LINQ -->
+<div class="card mt-4">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Consultas LINQ - Trabalho Acadêmico</h4>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Consulta 1: JOIN</h5>
+                        <p class="card-text">Filmes com informações de Categoria (JOIN entre 2 classes)</p>
+                        <a asp-action="Consulta1" class="btn btn-outline-primary">Executar Consulta</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Consulta 2: GROUP BY</h5>
+                        <p class="card-text">Filmes agrupados por categoria com funções de agregação</p>
+                        <a asp-action="Consulta2" class="btn btn-outline-primary">Executar Consulta</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Consulta 3: WHERE + HAVING</h5>
+                        <p class="card-text">Filmes antigos agrupados por produtora com filtros</p>
+                        <a asp-action="Consulta3" class="btn btn-outline-primary">Executar Consulta</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

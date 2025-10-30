@@ -1,0 +1,32 @@
+@model CinemaApp.Models.Produtora
+
+@{
+    ViewData["Title"] = "Excluir Produtora";
+}
+
+<h1>Excluir Produtora</h1>
+
+<h3>Tem certeza que deseja excluir esta produtora?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PaisOrigem)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PaisOrigem)
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="ProdutoraId" />
+        <input type="submit" value="Excluir" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+    </form>
+</div>

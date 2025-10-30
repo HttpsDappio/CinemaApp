@@ -1,0 +1,41 @@
+@model CinemaApp.Models.Filme
+
+@{
+    ViewData["Title"] = "Detalhes do Filme";
+}
+
+<h1>Detalhes do Filme</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Titulo)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Titulo)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.AnoLancamento)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.AnoLancamento)
+        </dd>
+        <dt class="col-sm-2">
+            Categoria
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Categoria.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            Produtora
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Produtora.Nome)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.FilmeId" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+</div>

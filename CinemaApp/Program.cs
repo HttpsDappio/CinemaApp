@@ -9,7 +9,7 @@ builder.Services.AddControllersWithViews();
 
 // Database Configuration
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer("Server=localhost;Database=CinemaDb;Trusted_Connection=true;TrustServerCertificate=true;"));
+    options.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=CinemaDb;Trusted_Connection=true;TrustServerCertificate=true;"));
 
 // Repositories
 builder.Services.AddScoped<IFilmeRepository, FilmeRepository>();

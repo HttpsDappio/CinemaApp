@@ -1,8 +1,62 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Cinema App - Home";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bem-vindo ao Cinema App</h1>
+    <p>Sistema de gerenciamento de filmes, categorias, produtoras e atores.</p>
+
+    <div class="row mt-5">
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Filmes</h5>
+                    <p class="card-text">Gerencie o catálogo de filmes</p>
+                    <a href="/Filmes" class="btn btn-light">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Categorias</h5>
+                    <p class="card-text">Gerencie as categorias de filmes</p>
+                    <a href="/Categorias" class="btn btn-light">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Produtoras</h5>
+                    <p class="card-text">Gerencie as produtoras</p>
+                    <a href="/Produtoras" class="btn btn-light">Acessar</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-4">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Atores</h5>
+                    <p class="card-text">Gerencie o elenco de atores</p>
+                    <a href="/Atores" class="btn btn-light">Acessar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-dark text-white">
+            <h4>Consultas LINQ Disponíveis</h4>
+        </div>
+        <div class="card-body">
+            <p>No módulo de Filmes, você encontrará 3 consultas LINQ demonstrando:</p>
+            <ul class="list-group">
+                <li class="list-group-item">✅ JOIN entre 2 classes (Filmes + Categorias)</li>
+                <li class="list-group-item">✅ GROUP BY com funções de agregação</li>
+                <li class="list-group-item">✅ WHERE + HAVING com filtros</li>
+            </ul>
+            <a href="/Filmes" class="btn btn-primary mt-3">Ver Consultas LINQ</a>
+        </div>
+    </div>
 </div>

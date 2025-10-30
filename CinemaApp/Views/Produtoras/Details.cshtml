@@ -1,0 +1,29 @@
+@model CinemaApp.Models.Produtora
+
+@{
+    ViewData["Title"] = "Detalhes da Produtora";
+}
+
+<h1>Detalhes da Produtora</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.PaisOrigem)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.PaisOrigem)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.ProdutoraId" class="btn btn-warning">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Voltar para Lista</a>
+</div>

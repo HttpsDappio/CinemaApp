@@ -1,0 +1,95 @@
+﻿@model List<object>
+
+@{
+    ViewData["Title"] = ViewBag.Titulo;
+    var descricao = ViewBag.Descricao;
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a asp-action="Index">Filmes</a></li>
+                    <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                </ol>
+            </nav>
+
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h2 class="mb-0">@ViewData["Title"]</h2>
+                    <small>@descricao</small>
+                </div>
+                <div class="card-body">
+                    @if (Model.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        @foreach (var prop in Model.First().GetType().GetProperties())
+                                        {
+                                            <th>@prop.Name</th>
+                                        }
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            @foreach (var prop in item.GetType().GetProperties())
+                                            {
+                                                <td>
+                                                    @{
+                                                        var value = prop.GetValue(item);
+                                                        if (value is System.Collections.IEnumerable enumerable && !(value is string))
+                                                        {
+                                                            <ul class="list-unstyled mb-0">
+                                                                @foreach (var subItem in enumerable)
+                                                                {
+                                                                    <li><small>@subItem</small></li>
+                                                                }
+                                                            </ul>
+                                                        }
+                                                        else if (value is double || value is decimal)
+                                                        {
+                                                            <span>@string.Format("{0:F2}", value)</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @value
+                                                        }
+                                                    }
+                                                </td>
+                                            }
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-3">
+                            <div class="alert alert-success">
+                                <strong>Consulta executada com sucesso!</strong><br>
+                                <small>Total de registros: @Model.Count</small>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            <strong>Nenhum resultado encontrado!</strong><br>
+                            <small>Tente adicionar mais dados ao sistema.</small>
+                        </div>
+                    }
+
+                    <div class="mt-4">
+                        <a asp-action="Index" class="btn btn-secondary">
+                            Voltar para Lista de Filmes
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
