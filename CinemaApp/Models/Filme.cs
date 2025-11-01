@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace CinemaApp.Models;
 
@@ -9,6 +10,7 @@ public class Filme
     [Required(ErrorMessage = "O título é obrigatório")]
     public string? Titulo { get; set; }
 
+    [DisplayName("Ano Lançamento")]
     [Range(1900, 2025, ErrorMessage = "Ano deve estar entre 1900 e 2025")]
     public int AnoLancamento { get; set; }
 

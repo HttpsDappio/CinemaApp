@@ -15,11 +15,10 @@ public class AppDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // Configurar chave composta para FilmeAtor
+
         modelBuilder.Entity<FilmeAtor>()
             .HasKey(fa => new { fa.FilmeId, fa.AtorId });
 
-        // Configurar relacionamentos
         modelBuilder.Entity<FilmeAtor>()
             .HasOne(fa => fa.Filme)
             .WithMany(f => f.FilmesAtores)
@@ -30,7 +29,6 @@ public class AppDbContext : DbContext
             .WithMany(a => a.FilmesAtores)
             .HasForeignKey(fa => fa.AtorId);
 
-        // Seed data - Dados iniciais
         modelBuilder.Entity<Categoria>().HasData(
             new Categoria { CategoriaId = 1, Nome = "Ação", Descricao = "Filmes de ação e aventura" },
             new Categoria { CategoriaId = 2, Nome = "Drama", Descricao = "Filmes dramáticos" },

@@ -269,6 +269,8 @@ namespace CinemaApp.Controllers
                         {
                             Grupo = g.Key.ToString(),
                             TotalFilmes = g.Count(),
+                            AnoMaisRecente = g.Key,
+                            AnoMaisAntigo = g.Key, 
                             AnoMedio = g.Average(f => f.AnoLancamento)
                         })
                         .OrderByDescending(x => x.TotalFilmes)

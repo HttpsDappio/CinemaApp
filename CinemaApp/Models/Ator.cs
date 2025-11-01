@@ -1,4 +1,6 @@
-﻿namespace CinemaApp.Models;
+﻿using System.ComponentModel;
+
+namespace CinemaApp.Models;
 
 public class Ator
 {
