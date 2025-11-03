@@ -162,11 +162,10 @@ namespace CinemaApp.Controllers
             return _context.Filmes.Any(e => e.FilmeId == id);
         }
 
-        // =============================================
-        // CONSULTAS LINQ - ATENDENDO OS PEDIDOS
-        // =============================================
 
-        // CONSULTA 1: Dados de duas classes (Filmes + Categorias) - CORRIGIDA
+// CONSULTAS LINQ 
+        
+        // CONSULTA 1: Dados de duas classes (Filmes + Categorias)
         public async Task<IActionResult> Consulta1(int? categoriaId)
         {
             // Buscar categorias para o select
@@ -188,7 +187,7 @@ namespace CinemaApp.Controllers
                 {
                     Filme = f.Titulo,
                     Ano = f.AnoLancamento,
-                    Idade = DateTime.Now.Year - f.AnoLancamento, // Usando método existente
+                    Idade = DateTime.Now.Year - f.AnoLancamento, 
                     Categoria = f.Categoria.Nome,
                     DescricaoCategoria = f.Categoria.Descricao,
                     Produtora = f.Produtora.Nome
@@ -206,7 +205,7 @@ namespace CinemaApp.Controllers
             return View("Consulta1", resultadoConvertido);
         }
 
-        // CONSULTA 2: Funções de grupo (GROUP BY) - SIMPLIFICADA
+        // CONSULTA 2: Funções de grupo (GROUP BY)
         public async Task<IActionResult> Consulta2(string grupoPor)
         {
             var opcoesGrupo = new List<SelectListItem>
@@ -217,7 +216,7 @@ namespace CinemaApp.Controllers
     };
             ViewBag.GrupoPor = new SelectList(opcoesGrupo, "Value", "Text", grupoPor);
 
-            // Definir view diretamente baseada no grupo
+            // Definir view baseada no grupo
             ViewBag.Titulo = "Consulta 2 - Estatísticas por Grupo";
             ViewBag.Descricao = $"Agrupado por: {(string.IsNullOrEmpty(grupoPor) ? "Categoria" : grupoPor)}";
             ViewBag.GrupoSelecionado = grupoPor;
@@ -227,7 +226,7 @@ namespace CinemaApp.Controllers
                 return View("Consulta2", new List<object>());
             }
 
-            // Fazer a consulta e passar diretamente para a view sem conversões complexas
+            // Fazer a consulta e passa diretamente para a view
             switch (grupoPor)
             {
                 case "categoria":
@@ -282,7 +281,7 @@ namespace CinemaApp.Controllers
             }
         }
 
-        // CONSULTA 3: WHERE + HAVING - CORRIGIDA
+        // CONSULTA 3: WHERE + HAVING
         public async Task<IActionResult> Consulta3(string filtroWhere, int? quantidadeMinima)
         {
             var opcoesWhere = new List<SelectListItem>
@@ -304,7 +303,7 @@ namespace CinemaApp.Controllers
 
             var query = _context.Filmes.AsQueryable();
 
-            // WHERE - Filtro principal (usando apenas AnoLancamento que EXISTE)
+            // WHERE - Filtro principal
             switch (filtroWhere)
             {
                 case "antigos":
@@ -321,7 +320,7 @@ namespace CinemaApp.Controllers
                     break;
             }
 
-            // GROUP BY + HAVING (agrupando por Categoria em vez de Genero)
+            // GROUP BY + HAVING 
             var resultado = await query
                 .Include(f => f.Categoria)
                 .GroupBy(f => f.Categoria.Nome)
